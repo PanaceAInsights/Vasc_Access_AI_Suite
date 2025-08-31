@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vascular Access ML Research - Interactive Proposal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #ecf0f1;
+            font-weight: 300;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #7f8c8d;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: #f0f8ff;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .workflow-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .ml-workflow {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .workflow-stages {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 40px 0;
+        }
+
+        .workflow-stage {
+            flex: 1;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .stage-box {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .stage-box:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+        }
+
+        .stage-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .stage-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-top: 10px;
+        }
+
+        .stage-content {
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .workflow-connector {
+            position: absolute;
+            top: 50%;
+            right: -40px;
+            width: 40px;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 1;
+        }
+
+        .workflow-connector::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #dee2e6;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .ml-diagram {
+            margin: 30px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .neural-network-svg {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .data-feature {
+            background: #f8f9fa;
+            border-left: 3px solid #3498db;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.9em;
+            color: #495057;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .algorithm-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .algorithm-card:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .algorithm-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .algorithm-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .algorithm-metric {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+
+        .performance-metrics {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 300;
+            color: #2c3e50;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .input-box, .output-box {
+            background: #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .expandable {
+            cursor: pointer;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .expandable::before {
+            content: '▶';
+            position: absolute;
+            left: 5px;
+            transition: transform 0.3s;
+        }
+
+        .expandable.expanded::before {
+            transform: rotate(90deg);
+        }
+
+        .expandable-content {
+            display: none;
+            padding: 10px 0 0 25px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .expandable-content.show {
+            display: block;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .demo-calculator {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e6ed;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .results-panel {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .results-panel.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .visual-chart {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            height: 350px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .timeline-table th, .timeline-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .timeline-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .timeline-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #95a5a6;
+            font-size: 0.85em;
+            border-top: 1px solid #e0e6ed;
+            margin-top: 50px;
+        }
+
+        .publication-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .publication-card {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+
+        .publication-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #survivalChart, #modalityChart, #riskChart {
+            max-width: 100%;
+            height: 100%;
+        }
+
+        .model-comparison {
+            overflow-x: auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            min-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Machine Learning for Vascular Access Outcomes</h1>
+        <p>Research Collaboration Proposal - Advanced Predictive Modeling</p>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('overview')">Overview</button>
+            <button class="tab-button" onclick="showTab('portfolio')">Research Portfolio</button>
+            <button class="tab-button" onclick="showTab('vamps')">VAMPS Demo</button>
+            <button class="tab-button" onclick="showTab('access')">AccessChoice Demo</button>
+            <button class="tab-button" onclick="showTab('cri')">CRI-Guard Demo</button>
+            <button class="tab-button" onclick="showTab('timeline')">Timeline</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="workflow-container">
+                <h2 style="color: #2c3e50; margin-bottom: 10px; font-weight: 500;">Research Workflow</h2>
+                <p style="color: #6c757d; margin-bottom: 30px;">Comprehensive ML pipeline for vascular access outcome prediction</p>
+                
+                <!-- Main Research Workflow - Keep this at top -->
+                <div class="ml-workflow">
+                    <div class="workflow-stages">
+                        <!-- Stage 1: Input -->
+                        <div class="workflow-stage">
+                            <div class="stage-box">
+                                <div class="stage-number">1</div>
+                                <div class="stage-title">Input</div>
+                                <div class="stage-content">
+                                    <div class="data-feature"><strong>Patient Data</strong></div>
+                                    <div class="data-feature">• Demographics & comorbidities</div>
+                                    <div class="data-feature">• 20-year registry (n≈1000+)</div>
+                                    <div class="data-feature"><strong>Doppler Mapping</strong></div>
+                                    <div class="data-feature">• Vein diameter & velocity</div>
+                                    <div class="data-feature">• Flow characteristics</div>
+                                    <div class="data-feature"><strong>Clinical Variables</strong></div>
+                                    <div class="data-feature">• Surgical history</div>
+                                    <div class="data-feature">• Laboratory values</div>
+                                </div>
+                            </div>
+                            <div class="workflow-connector"></div>
+                        </div>
+
+                        <!-- Stage 2: Analysis -->
+                        <div class="workflow-stage">
+                            <div class="stage-box">
+                                <div class="stage-number">2</div>
+                                <div class="stage-title">Analysis</div>
+                                <div class="stage-content">
+                                    <div class="data-feature"><strong>Machine Learning</strong></div>
+                                    <div class="data-feature">• Deep Neural Networks</div>
+                                    <div class="data-feature">• Random Survival Forests</div>
+                                    <div class="data-feature">• XGBoost/Cox-LASSO</div>
+                                    <div class="data-feature"><strong>Validation</strong></div>
+                                    <div class="data-feature">• 10-fold cross-validation</div>
+                                    <div class="data-feature">• Bootstrap (n=500)</div>
+                                    <div class="data-feature">• SHAP explainability</div>
+                                </div>
+                            </div>
+                            <div class="workflow-connector"></div>
+                        </div>
+
+                        <!-- Stage 3: Output -->
+                        <div class="workflow-stage">
+                            <div class="stage-box">
+                                <div class="stage-number">3</div>
+                                <div class="stage-title">Output</div>
+                                <div class="stage-content">
+                                    <div class="data-feature"><strong>Prognostic Tools</strong></div>
+                                    <div class="data-feature">• Risk nomograms</div>
+                                    <div class="data-feature">• Survival curves</div>
+                                    <div class="data-feature"><strong>Clinical Integration</strong></div>
+                                    <div class="data-feature">• Web calculators</div>
+                                    <div class="data-feature">• REDCap API</div>
+                                    <div class="data-feature"><strong>Decision Support</strong></div>
+                                    <div class="data-feature">• Personalized reports</div>
+                                    <div class="data-feature">• Treatment guidance</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced ML Visualization Section -->
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 30px; text-align: center;">Advanced Machine Learning Architecture</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <!-- Neural Network Visualization -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #34495e; margin-bottom: 20px;">Deep Neural Network</h4>
+                            <canvas id="neuralNetCanvas" width="400" height="300"></canvas>
+                        </div>
+
+                        <!-- Heatmap Visualization -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #34495e; margin-bottom: 20px;">Feature Importance Heatmap</h4>
+                            <canvas id="heatmapCanvas" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                        <!-- K-means Clustering -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #34495e; margin-bottom: 20px;">Patient Clustering (K-means)</h4>
+                            <canvas id="kmeansCanvas" width="400" height="300"></canvas>
+                        </div>
+
+                        <!-- ROC Curves -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                            <h4 style="color: #34495e; margin-bottom: 20px;">Model Performance (ROC)</h4>
+                            <canvas id="rocCanvas" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="performance-metrics" style="margin-top: 30px;">
+                    <div class="metric-item">
+                        <div class="metric-value">0.876</div>
+                        <div class="metric-label">C-index</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">0.89</div>
+                        <div class="metric-label">AUC</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Sensitivity</div>
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    <strong>Note:</strong> All visualizations use simulated data for demonstration. 
+                    Actual models will be trained on your comprehensive vascular access registry.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 style="color: #2c3e50;">Research Impact Potential</h2>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">20</div>
+                        <div class="stat-label">Years of Data</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">85%+</div>
+                        <div class="stat-label">Target Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Predictive Models</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3-5</div>
+                        <div class="stat-label">Publications</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Tab -->
+        <div id="portfolio" class="tab-content">
+            <div class="section">
+                <h2 style="color: #2c3e50;">Published Predictive Models</h2>
+                <div class="publication-grid">
+                    <div class="publication-card">
+                        <h4>Medullary Thyroid Carcinoma</h4>
+                        <p><strong>Journal:</strong> Histopathology (2024)</p>
+                        <p><strong>Cohort:</strong> Multi-institutional, n=387</p>
+                        <div>
+                            <span class="metric-badge">C-index: 0.876</span>
+                            <span class="metric-badge">10-fold CV</span>
+                            <span class="metric-badge">SHAP Analysis</span>
+                        </div>
+                        <p style="margin-top: 10px;">
+                            <a href="https://nomograms.shinyapps.io/MTC_ML_DFS/" target="_blank" style="color: #3498db;">
+                                View Live Calculator →
+                            </a>
+                        </p>
+                    </div>
+
+                    <div class="publication-card">
+                        <h4>Diffuse Pleural Mesothelioma</h4>
+                        <p><strong>Journal:</strong> Pathology (2023)</p>
+                        <p><strong>Cohort:</strong> 30-year registry, n=369</p>
+                        <div>
+                            <span class="metric-badge">AUC: 0.75</span>
+                            <span class="metric-badge">3-fold CV</span>
+                            <span class="metric-badge">Cox Models</span>
+                        </div>
+                        <p style="margin-top: 10px;">
+                            <a href="https://nomograms.shinyapps.io/Meso_Cox_ML/" target="_blank" style="color: #3498db;">
+                                View Live Calculator →
+                            </a>
+                        </p>
+                    </div>
+
+                    <div class="publication-card">
+                        <h4>Malignant Colorectal Polyps</h4>
+                        <p><strong>Journal:</strong> ANZ J Surgery (2025)</p>
+                        <p><strong>Cohort:</strong> Queensland Registry, n=1,646</p>
+                        <div>
+                            <span class="metric-badge">Accuracy: 76%</span>
+                            <span class="metric-badge">GLM Model</span>
+                            <span class="metric-badge">Bonferroni</span>
+                        </div>
+                        <p style="margin-top: 10px;">
+                            <a href="https://malignantpolyp.com/risk-calculator" target="_blank" style="color: #3498db;">
+                                View Live Calculator →
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 style="color: #2c3e50;">Model Performance Comparison</h2>
+                <div class="model-comparison">
+                    <table class="comparison-table timeline-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>C-index</th>
+                                <th>AUC</th>
+                                <th>Calibration</th>
+                                <th>Clinical Utility</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cox-LASSO</td>
+                                <td>0.82</td>
+                                <td>0.85</td>
+                                <td>Excellent</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest</td>
+                                <td>0.79</td>
+                                <td>0.83</td>
+                                <td>Good</td>
+                                <td>Moderate</td>
+                            </tr>
+                            <tr>
+                                <td>Deep Learning</td>
+                                <td>0.84</td>
+                                <td>0.87</td>
+                                <td>Good</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>Ensemble</td>
+                                <td><strong>0.86</strong></td>
+                                <td><strong>0.89</strong></td>
+                                <td>Excellent</td>
+                                <td>Highest</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VAMPS Demo Tab -->
+        <div id="vamps" class="tab-content">
+            <div class="section">
+                <h2 style="color: #2c3e50;">VAMPS: Vascular Access Maturation Predictor</h2>
+                <p style="margin-bottom: 20px;">Interactive demonstration of fistula maturation prediction using Doppler parameters</p>
+
+                <div class="demo-calculator">
+                    <h3>Patient Parameters</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="input-group">
+                            <label>Cephalic Vein Diameter (mm)</label>
+                            <input type="range" id="vamps-diameter" min="1.5" max="6" step="0.1" value="3" oninput="updateVampsValue('diameter', this.value)">
+                            <span id="vamps-diameter-value">3.0 mm</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Peak Systolic Velocity (cm/s)</label>
+                            <input type="range" id="vamps-velocity" min="20" max="80" step="1" value="45" oninput="updateVampsValue('velocity', this.value)">
+                            <span id="vamps-velocity-value">45 cm/s</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Age (years)</label>
+                            <input type="number" id="vamps-age" value="65" min="18" max="100">
+                        </div>
+                        <div class="input-group">
+                            <label>Diabetes</label>
+                            <select id="vamps-diabetes">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Previous Access Failure</label>
+                            <select id="vamps-previous">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Surgeon Experience</label>
+                            <select id="vamps-surgeon">
+                                <option value="expert">Expert (>50 cases/year)</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="novice">Novice (<10 cases/year)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="calculateVAMPS()" style="margin-top: 20px;">Calculate Predictions</button>
+                </div>
+
+                <div id="vamps-results" class="results-panel">
+                    <h3>Predicted Outcomes</h3>
+                    
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="vamps-maturation">-</div>
+                            <div class="stat-label">Maturation Success</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="vamps-time">-</div>
+                            <div class="stat-label">Time to Maturation</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="vamps-patency">-</div>
+                            <div class="stat-label">12-Month Patency</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="vamps-interventions">-</div>
+                            <div class="stat-label">Interventions/Year</div>
+                        </div>
+                    </div>
+
+                    <div class="visual-chart">
+                        <h4>Survival Curves</h4>
+                        <canvas id="survivalChart"></canvas>
+                    </div>
+
+                    <div class="visual-chart" style="height: auto; min-height: 200px;">
+                        <h4>Risk Factors Contribution (SHAP Values)</h4>
+                        <div id="shap-bars"></div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Clinical Recommendation</h4>
+                        <p id="vamps-recommendation" style="padding: 15px; background: #e8f5e9; border-radius: 5px;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AccessChoice Demo Tab -->
+        <div id="access" class="tab-content">
+            <div class="section">
+                <h2 style="color: #2c3e50;">AccessChoice: Modality Selection Support</h2>
+                <p style="margin-bottom: 20px;">Personalized dialysis modality recommendations based on patient factors</p>
+
+                <div class="demo-calculator">
+                    <h3>Clinical Profile</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="input-group">
+                            <label>eGFR (mL/min/1.73m²)</label>
+                            <input type="range" id="access-egfr" min="5" max="20" value="12" oninput="updateAccessValue('egfr', this.value)">
+                            <span id="access-egfr-value">12</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Charlson Comorbidity Index</label>
+                            <input type="range" id="access-cci" min="0" max="10" value="3" oninput="updateAccessValue('cci', this.value)">
+                            <span id="access-cci-value">3</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Vascular Quality</label>
+                            <select id="access-vascular">
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="poor">Poor</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Patient Preference</label>
+                            <select id="access-preference">
+                                <option value="independence">Maximum Independence</option>
+                                <option value="minimal-visits">Minimal Hospital Visits</option>
+                                <option value="flexibility">Schedule Flexibility</option>
+                                <option value="no-preference">No Strong Preference</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Social Support</label>
+                            <select id="access-support">
+                                <option value="strong">Strong</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="limited">Limited</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Cognitive Function</label>
+                            <select id="access-cognitive">
+                                <option value="normal">Normal</option>
+                                <option value="mild">Mild Impairment</option>
+                                <option value="moderate">Moderate Impairment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="calculateAccess()" style="margin-top: 20px;">Analyze Options</button>
+                </div>
+
+                <div id="access-results" class="results-panel">
+                    <h3>Modality Comparison</h3>
+                    
+                    <div class="visual-chart">
+                        <h4>Technique Survival Probability</h4>
+                        <canvas id="modalityChart"></canvas>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h4>Detailed Analysis</h4>
+                        <table class="timeline-table">
+                            <thead>
+                                <tr>
+                                    <th>Modality</th>
+                                    <th>2-Year Survival</th>
+                                    <th>Infection Risk</th>
+                                    <th>QoL Score</th>
+                                    <th>Recommendation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modality-comparison">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Personalized Recommendation</h4>
+                        <div id="access-recommendation" style="padding: 20px; background: #e3f2fd; border-radius: 5px; border-left: 4px solid #2196f3;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRI-Guard Demo Tab -->
+        <div id="cri" class="tab-content">
+            <div class="section">
+                <h2 style="color: #2c3e50;">CRI-Guard: Infection Risk Monitoring</h2>
+                <p style="margin-bottom: 20px;">Dynamic prediction of catheter-related infections</p>
+
+                <div class="demo-calculator">
+                    <h3>Current Clinical Status</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="input-group">
+                            <label>Days Since Catheter Insertion</label>
+                            <input type="number" id="cri-days" value="45" min="1" max="365">
+                        </div>
+                        <div class="input-group">
+                            <label>White Blood Cell Count (×10⁹/L)</label>
+                            <input type="number" id="cri-wbc" value="8.5" step="0.1" min="2" max="20">
+                        </div>
+                        <div class="input-group">
+                            <label>C-Reactive Protein (mg/L)</label>
+                            <input type="number" id="cri-crp" value="5" step="0.1" min="0" max="100">
+                        </div>
+                        <div class="input-group">
+                            <label>Previous CRBSI Episodes</label>
+                            <select id="cri-previous">
+                                <option value="0">None</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">≥3</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Catheter Site</label>
+                            <select id="cri-site">
+                                <option value="jugular">Internal Jugular</option>
+                                <option value="subclavian">Subclavian</option>
+                                <option value="femoral">Femoral</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Immunosuppression</label>
+                            <select id="cri-immune">
+                                <option value="none">None</option>
+                                <option value="mild">Mild</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="severe">Severe</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="calculateCRI()" style="margin-top: 20px;">Calculate Risk</button>
+                </div>
+
+                <div id="cri-results" class="results-panel">
+                    <h3>Infection Risk Assessment</h3>
+                    
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="cri-30day">-</div>
+                            <div class="stat-label">30-Day Risk</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="cri-60day">-</div>
+                            <div class="stat-label">60-Day Risk</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="cri-90day">-</div>
+                            <div class="stat-label">90-Day Risk</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="cri-risk-level">-</div>
+                            <div class="stat-label">Risk Level</div>
+                        </div>
+                    </div>
+
+                    <div class="visual-chart">
+                        <h4>Risk Trajectory</h4>
+                        <canvas id="riskChart"></canvas>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Clinical Actions</h4>
+                        <div id="cri-actions" style="padding: 15px; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Tab -->
+        <div id="timeline" class="tab-content">
+            <div class="section">
+                <h2 style="color: #2c3e50;">Research Timeline</h2>
+                <table class="timeline-table">
+                    <thead>
+                        <tr>
+                            <th>Phase</th>
+                            <th>Duration</th>
+                            <th>Key Deliverables</th>
+                            <th>Milestones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #e3f2fd;">
+                            <td><strong>Ethics Approval</strong></td>
+                            <td>Months 1-2</td>
+                            <td>
+                                • Full HREC review submission<br>
+                                • Consent waiver application<br>
+                                • Data governance agreements<br>
+                                • Privacy impact assessment
+                            </td>
+                            <td>HREC approval obtained</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Research Planning</strong></td>
+                            <td>Months 3-4</td>
+                            <td>
+                                • Research question formulation<br>
+                                • Statistical analysis plan<br>
+                                • Soft reports generation<br>
+                                • Variable selection
+                            </td>
+                            <td>Protocol finalized</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td><strong>Data Analysis</strong></td>
+                            <td>Months 5-7</td>
+                            <td>
+                                • Exploratory data analysis<br>
+                                • Missing data assessment<br>
+                                • Feature engineering<br>
+                                • Preliminary statistics
+                            </td>
+                            <td>Dataset prepared</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Model Development</strong></td>
+                            <td>Months 8-10</td>
+                            <td>
+                                • Algorithm selection<br>
+                                • Model training<br>
+                                • Hyperparameter tuning<br>
+                                • Ensemble creation
+                            </td>
+                            <td>Initial models complete</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td><strong>Internal Validation</strong></td>
+                            <td>Months 11-12</td>
+                            <td>
+                                • Cross-validation<br>
+                                • Bootstrap validation<br>
+                                • Calibration assessment<br>
+                                • Performance metrics
+                            </td>
+                            <td>C-index >0.80</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Testing & Refinement</strong></td>
+                            <td>Months 13-14</td>
+                            <td>
+                                • Model optimization<br>
+                                • Sensitivity analysis<br>
+                                • SHAP analysis<br>
+                                • Clinical interpretation
+                            </td>
+                            <td>Final model selected</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td><strong>Tool Development</strong></td>
+                            <td>Months 15-16</td>
+                            <td>
+                                • Web calculator build<br>
+                                • REDCap integration<br>
+                                • User interface design<br>
+                                • Beta testing
+                            </td>
+                            <td>Calculator deployed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Clinical Pilot</strong></td>
+                            <td>Months 17-18</td>
+                            <td>
+                                • Prospective validation<br>
+                                • User feedback collection<br>
+                                • Clinical workflow integration<br>
+                                • Impact assessment
+                            </td>
+                            <td>10+ clinicians engaged</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td><strong>Publication</strong></td>
+                            <td>Months 19-21</td>
+                            <td>
+                                • Manuscript preparation<br>
+                                • Journal submission<br>
+                                • Conference abstracts<br>
+                                • Supplementary materials
+                            </td>
+                            <td>Paper submitted</td>
+                        </tr>
+                        <tr style="background: #e8f5e9;">
+                            <td><strong>Grant Applications</strong></td>
+                            <td>Months 22-24</td>
+                            <td>
+                                • NHMRC/MRFF proposals<br>
+                                • Preliminary data package<br>
+                                • Budget preparation<br>
+                                • Collaboration agreements
+                            </td>
+                            <td>Grant submitted</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 30px;">
+                    <h3>Critical Path Activities</h3>
+                    <ul style="line-height: 2;">
+                        <li><strong>Months 1-2:</strong> Ethics approval is the gating factor - no data access until approved</li>
+                        <li><strong>Months 3-4:</strong> Research questions must be clearly defined before analysis begins</li>
+                        <li><strong>Months 5-10:</strong> Core analytical phase requiring intensive computational resources</li>
+                        <li><strong>Months 11-14:</strong> Rigorous validation essential for clinical credibility</li>
+                        <li><strong>Months 15-24:</strong> Translation and dissemination for real-world impact</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3>Funding Opportunities</h3>
+                    <ul style="line-height: 2;">
+                        <li><strong>NHMRC Ideas Grant:</strong> Novel ML approaches for vascular access ($500K-$1M)</li>
+                        <li><strong>MRFF Frontier Health:</strong> AI-powered nephrology decision support ($2-5M)</li>
+                        <li><strong>NSW Health Translational:</strong> Implementation of predictive tools ($250-500K)</li>
+                        <li><strong>Kidney Health Australia:</strong> Innovation grants for dialysis improvement ($100-200K)</li>
+                        <li><strong>Industry Partnership:</strong> Device manufacturers (Fresenius, Baxter) collaboration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Dr. Yagiz Alp Aksoy | Resident Medical Officer, RNSH | Clinical Fellow, Biomedical AI Centre, Centenary Institute</p>
+        <p>Contact: yagizalp.aksoy@gmail.com</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize chart variables
+        let survivalChart = null;
+        let modalityChart = null;
+        let riskChart = null;
+
+        // Initialize visualizations when page loads
+        window.addEventListener('load', function() {
+            drawNeuralNetwork();
+            drawHeatmap();
+            drawKMeans();
+            drawROCCurves();
+        });
+
+        // Neural Network Visualization
+        function drawNeuralNetwork() {
+            const canvas = document.getElementById('neuralNetCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Define layers
+            const layers = [
+                {neurons: 5, x: 50, label: 'Input'},
+                {neurons: 6, x: 150, label: 'Hidden 1'},
+                {neurons: 4, x: 250, label: 'Hidden 2'},
+                {neurons: 2, x: 350, label: 'Output'}
+            ];
+            
+            // Draw connections
+            ctx.strokeStyle = 'rgba(52, 152, 219, 0.2)';
+            ctx.lineWidth = 1;
+            
+            for (let l = 0; l < layers.length - 1; l++) {
+                const layer1 = layers[l];
+                const layer2 = layers[l + 1];
+                
+                for (let i = 0; i < layer1.neurons; i++) {
+                    const y1 = 60 + (i * 40);
+                    for (let j = 0; j < layer2.neurons; j++) {
+                        const y2 = 60 + (j * 40) + ((5 - layer2.neurons) * 20);
+                        ctx.beginPath();
+                        ctx.moveTo(layer1.x, y1);
+                        ctx.lineTo(layer2.x, y2);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Draw neurons
+            layers.forEach((layer, layerIndex) => {
+                for (let i = 0; i < layer.neurons; i++) {
+                    const y = 60 + (i * 40) + ((5 - layer.neurons) * 20);
+                    
+                    // Gradient for neurons
+                    const gradient = ctx.createRadialGradient(layer.x, y, 0, layer.x, y, 12);
+                    if (layerIndex === 0) {
+                        gradient.addColorStop(0, '#3498db');
+                        gradient.addColorStop(1, '#2980b9');
+                    } else if (layerIndex === layers.length - 1) {
+                        gradient.addColorStop(0, '#2ecc71');
+                        gradient.addColorStop(1, '#27ae60');
+                    } else {
+                        gradient.addColorStop(0, '#9b59b6');
+                        gradient.addColorStop(1, '#8e44ad');
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.arc(layer.x, y, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                
+                // Layer labels
+                ctx.fillStyle = '#34495e';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(layer.label, layer.x, 280);
+            });
+        }
+
+        // Heatmap Visualization
+        function drawHeatmap() {
+            const canvas = document.getElementById('heatmapCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Feature names
+            const features = ['Vein Diameter', 'Blood Velocity', 'Age', 'Diabetes', 'Previous Failure', 'eGFR', 'Albumin', 'CRP'];
+            const models = ['Cox', 'RF', 'XGB', 'DL', 'LASSO'];
+            
+            // Generate random importance values for demonstration
+            const cellWidth = 60;
+            const cellHeight = 30;
+            const startX = 100;
+            const startY = 40;
+            
+            // Draw heatmap cells
+            for (let i = 0; i < features.length; i++) {
+                for (let j = 0; j < models.length; j++) {
+                    const importance = Math.random();
+                    const intensity = Math.floor(importance * 255);
+                    
+                    // Color gradient from blue (low) to red (high)
+                    if (importance < 0.5) {
+                        ctx.fillStyle = `rgb(${intensity * 2}, ${100 + intensity}, ${255 - intensity})`;
+                    } else {
+                        ctx.fillStyle = `rgb(${255}, ${255 - (intensity - 128) * 2}, ${255 - intensity})`;
+                    }
+                    
+                    ctx.fillRect(startX + j * cellWidth, startY + i * cellHeight, cellWidth - 2, cellHeight - 2);
+                }
+                
+                // Feature labels
+                ctx.fillStyle = '#34495e';
+                ctx.font = '11px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(features[i], startX - 5, startY + i * cellHeight + 20);
+            }
+            
+            // Model labels
+            ctx.textAlign = 'center';
+            models.forEach((model, i) => {
+                ctx.fillText(model, startX + i * cellWidth + 30, startY - 5);
+            });
+            
+            // Title
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#7f8c8d';
+            ctx.textAlign = 'left';
+            ctx.fillText('Feature importance across models (darker = more important)', 10, 290);
+        }
+
+        // K-means Clustering Visualization
+        function drawKMeans() {
+            const canvas = document.getElementById('kmeansCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Generate random clusters
+            const clusters = [
+                {x: 100, y: 100, color: '#e74c3c', label: 'High Risk'},
+                {x: 250, y: 80, color: '#f39c12', label: 'Medium Risk'},
+                {x: 180, y: 200, color: '#2ecc71', label: 'Low Risk'}
+            ];
+            
+            // Draw points
+            clusters.forEach(cluster => {
+                for (let i = 0; i < 30; i++) {
+                    const x = cluster.x + (Math.random() - 0.5) * 80;
+                    const y = cluster.y + (Math.random() - 0.5) * 80;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = cluster.color;
+                    ctx.globalAlpha = 0.6;
+                    ctx.fill();
+                }
+                
+                // Draw centroid
+                ctx.beginPath();
+                ctx.arc(cluster.x, cluster.y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = cluster.color;
+                ctx.globalAlpha = 1;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+            
+            // Legend
+            ctx.globalAlpha = 1;
+            clusters.forEach((cluster, i) => {
+                ctx.fillStyle = cluster.color;
+                ctx.fillRect(10, 250 + i * 20, 15, 15);
+                ctx.fillStyle = '#34495e';
+                ctx.font = '12px Arial';
+                ctx.fillText(cluster.label, 30, 262 + i * 20);
+            });
+            
+            // Axes
+            ctx.strokeStyle = '#95a5a6';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(40, 250);
+            ctx.lineTo(360, 250);
+            ctx.moveTo(40, 30);
+            ctx.lineTo(40, 250);
+            ctx.stroke();
+            
+            // Axis labels
+            ctx.fillStyle = '#7f8c8d';
+            ctx.font = '10px Arial';
+            ctx.fillText('Component 1', 180, 270);
+            ctx.save();
+            ctx.translate(20, 140);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('Component 2', 0, 0);
+            ctx.restore();
+        }
+
+        // ROC Curves Visualization
+        function drawROCCurves() {
+            const canvas = document.getElementById('rocCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#95a5a6';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, 250);
+            ctx.lineTo(350, 250);
+            ctx.moveTo(50, 250);
+            ctx.lineTo(50, 50);
+            ctx.stroke();
+            
+            // Draw diagonal reference line
+            ctx.strokeStyle = '#bdc3c7';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(50, 250);
+            ctx.lineTo(350, 50);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw ROC curves for different models
+            const models = [
+                {name: 'Deep Learning', color: '#e74c3c', auc: 0.89},
+                {name: 'XGBoost', color: '#3498db', auc: 0.86},
+                {name: 'Cox-LASSO', color: '#2ecc71', auc: 0.82}
+            ];
+            
+            models.forEach(model => {
+                ctx.strokeStyle = model.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(50, 250);
+                
+                // Generate smooth ROC curve
+                for (let i = 0; i <= 100; i++) {
+                    const x = 50 + (i / 100) * 300;
+                    const fpr = i / 100;
+                    const tpr = Math.pow(fpr, 1 / (2 - model.auc));
+                    const y = 250 - (tpr * 200);
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            });
+            
+            // Legend
+            models.forEach((model, i) => {
+                ctx.fillStyle = model.color;
+                ctx.fillRect(60, 60 + i * 25, 15, 15);
+                ctx.fillStyle = '#34495e';
+                ctx.font = '12px Arial';
+                ctx.fillText(`${model.name} (AUC=${model.auc})`, 80, 72 + i * 25);
+            });
+            
+            // Axis labels
+            ctx.fillStyle = '#34495e';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('False Positive Rate', 200, 280);
+            ctx.save();
+            ctx.translate(20, 150);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('True Positive Rate', 0, 0);
+            ctx.restore();
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Expandable content
+        function toggleExpand(element) {
+            element.classList.toggle('expanded');
+            const content = element.nextElementSibling;
+            content.classList.toggle('show');
+        }
+
+        // Update slider values
+        function updateVampsValue(type, value) {
+            if (type === 'diameter') {
+                document.getElementById('vamps-diameter-value').textContent = value + ' mm';
+            } else if (type === 'velocity') {
+                document.getElementById('vamps-velocity-value').textContent = value + ' cm/s';
+            }
+        }
+
+        function updateAccessValue(type, value) {
+            document.getElementById(`access-${type}-value`).textContent = value;
+        }
+
+        // VAMPS Calculator
+        function calculateVAMPS() {
+            const diameter = parseFloat(document.getElementById('vamps-diameter').value);
+            const velocity = parseFloat(document.getElementById('vamps-velocity').value);
+            const age = parseFloat(document.getElementById('vamps-age').value);
+            const diabetes = parseInt(document.getElementById('vamps-diabetes').value);
+            const previous = parseInt(document.getElementById('vamps-previous').value);
+            const surgeon = document.getElementById('vamps-surgeon').value;
+            
+            // Simulated calculations
+            let maturationProb = 0.9 - (age - 50) * 0.005 - diabetes * 0.15 - previous * 0.2;
+            maturationProb = maturationProb + (diameter - 2) * 0.1 + (velocity - 30) * 0.003;
+            if (surgeon === 'expert') maturationProb += 0.1;
+            else if (surgeon === 'novice') maturationProb -= 0.15;
+            maturationProb = Math.min(0.95, Math.max(0.25, maturationProb));
+            
+            const timeWeeks = Math.round(8 - diameter + 2 * diabetes + (age > 70 ? 2 : 0));
+            const patency = maturationProb * 0.85;
+            const interventions = Math.round((1 - patency) * 3);
+            
+            // Update display
+            document.getElementById('vamps-maturation').textContent = Math.round(maturationProb * 100) + '%';
+            document.getElementById('vamps-time').textContent = timeWeeks + ' weeks';
+            document.getElementById('vamps-patency').textContent = Math.round(patency * 100) + '%';
+            document.getElementById('vamps-interventions').textContent = interventions;
+            
+            // Recommendation
+            let recommendation = '';
+            if (maturationProb > 0.7) {
+                recommendation = 'Strong candidate for AV fistula. Favorable anatomy and clinical profile suggest high likelihood of successful maturation.';
+            } else if (maturationProb > 0.5) {
+                recommendation = 'Moderate candidate for AV fistula. Consider optimizing modifiable factors before surgery or prepare backup access plan.';
+            } else {
+                recommendation = 'Poor candidate for AV fistula. Consider alternative access options (AV graft or peritoneal dialysis).';
+            }
+            document.getElementById('vamps-recommendation').textContent = recommendation;
+            
+            // Create survival chart
+            createSurvivalChart(maturationProb);
+            
+            // Create SHAP bars
+            createShapBars(diameter, velocity, age, diabetes, previous);
+            
+            document.getElementById('vamps-results').classList.add('show');
+        }
+
+        // Create survival chart - FIXED VERSION
+        function createSurvivalChart(baseline) {
+            try {
+                const ctx = document.getElementById('survivalChart');
+                if (!ctx) return;
+                
+                // Properly destroy existing chart
+                if (survivalChart) {
+                    survivalChart.destroy();
+                    survivalChart = null;
+                }
+                
+                const months = Array.from({length: 25}, (_, i) => i);
+                const survival = months.map(m => baseline * Math.exp(-0.02 * m));
+                const upper = months.map(m => Math.min(1, baseline * Math.exp(-0.015 * m) + 0.05));
+                const lower = months.map(m => Math.max(0, baseline * Math.exp(-0.025 * m) - 0.05));
+                
+                survivalChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Predicted Patency',
+                            data: survival,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            fill: false
+                        }, {
+                            label: '95% CI Upper',
+                            data: upper,
+                            borderColor: 'rgba(52, 152, 219, 0.3)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }, {
+                            label: '95% CI Lower',
+                            data: lower,
+                            borderColor: 'rgba(52, 152, 219, 0.3)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Months' }
+                            },
+                            y: { 
+                                title: { display: true, text: 'Patency Probability' }, 
+                                min: 0, 
+                                max: 1,
+                                ticks: {
+                                    stepSize: 0.1
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.log('Chart creation error:', error);
+            }
+        }
+
+        // Create SHAP visualization
+        function createShapBars(diameter, velocity, age, diabetes, previous) {
+            const factors = [
+                { name: 'Vein Diameter', value: (diameter - 3) * 0.15, color: diameter > 3 ? '#2ecc71' : '#e74c3c' },
+                { name: 'Blood Velocity', value: (velocity - 45) * 0.005, color: velocity > 45 ? '#2ecc71' : '#e74c3c' },
+                { name: 'Age', value: -(age - 65) * 0.008, color: age < 65 ? '#2ecc71' : '#e74c3c' },
+                { name: 'Diabetes', value: -diabetes * 0.15, color: diabetes ? '#e74c3c' : '#2ecc71' },
+                { name: 'Previous Failure', value: -previous * 0.2, color: previous ? '#e74c3c' : '#95a5a6' }
+            ];
+            
+            let html = '';
+            factors.forEach(f => {
+                const width = Math.abs(f.value * 200);
+                html += `
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 150px; text-align: right; padding-right: 10px;">${f.name}</div>
+                            <div style="width: 300px; height: 25px; background: #ecf0f1; position: relative;">
+                                <div style="position: absolute; ${f.value > 0 ? 'left: 50%' : 'right: 50%'}; 
+                                           width: ${width}px; height: 100%; background: ${f.color};"></div>
+                            </div>
+                            <div style="padding-left: 10px;">${f.value > 0 ? '+' : ''}${(f.value * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('shap-bars').innerHTML = html;
+        }
+
+        // AccessChoice Calculator
+        function calculateAccess() {
+            const egfr = parseFloat(document.getElementById('access-egfr').value);
+            const cci = parseInt(document.getElementById('access-cci').value);
+            const vascular = document.getElementById('access-vascular').value;
+            const preference = document.getElementById('access-preference').value;
+            
+            // Calculate scores
+            const vascScore = {excellent: 0.9, good: 0.7, moderate: 0.5, poor: 0.3}[vascular];
+            
+            const results = [
+                {
+                    modality: 'AV Fistula',
+                    survival: vascScore * 0.85 - cci * 0.03,
+                    infection: 0.05,
+                    qol: 85,
+                    color: '#3498db'
+                },
+                {
+                    modality: 'AV Graft',
+                    survival: 0.65 - cci * 0.02,
+                    infection: 0.08,
+                    qol: 75,
+                    color: '#9b59b6'
+                },
+                {
+                    modality: 'Peritoneal Dialysis',
+                    survival: 0.70 - cci * 0.025,
+                    infection: 0.12,
+                    qol: preference === 'independence' ? 90 : 70,
+                    color: '#2ecc71'
+                },
+                {
+                    modality: 'Tunneled Catheter',
+                    survival: 0.50 - cci * 0.04,
+                    infection: 0.20,
+                    qol: 60,
+                    color: '#e74c3c'
+                }
+            ];
+            
+            // Sort by survival
+            results.sort((a, b) => b.survival - a.survival);
+            
+            // Create comparison table
+            let tableHtml = '';
+            results.forEach(r => {
+                const riskClass = r.survival > 0.7 ? 'risk-low' : r.survival > 0.5 ? 'risk-medium' : 'risk-high';
+                tableHtml += `
+                    <tr>
+                        <td>${r.modality}</td>
+                        <td>${Math.round(r.survival * 100)}%</td>
+                        <td>${Math.round(r.infection * 100)}%</td>
+                        <td>${r.qol}/100</td>
+                        <td><span class="${riskClass}">${r.survival > 0.7 ? 'Recommended' : r.survival > 0.5 ? 'Consider' : 'Caution'}</span></td>
+                    </tr>
+                `;
+            });
+            document.getElementById('modality-comparison').innerHTML = tableHtml;
+            
+            // Create chart
+            createModalityChart(results);
+            
+            // Recommendation
+            const best = results[0];
+            let recommendation = `Based on comprehensive analysis, <strong>${best.modality}</strong> appears to be the optimal choice with ${Math.round(best.survival * 100)}% predicted 2-year technique survival. `;
+            recommendation += `This recommendation considers your ${vascular} vascular quality, comorbidity burden (CCI: ${cci}), and preference for ${preference.replace('-', ' ')}.`;
+            document.getElementById('access-recommendation').innerHTML = recommendation;
+            
+            document.getElementById('access-results').classList.add('show');
+        }
+
+        // Create modality comparison chart - FIXED VERSION
+        function createModalityChart(results) {
+            const ctx = document.getElementById('modalityChart');
+            if (!ctx) return;
+            
+            // Properly destroy existing chart
+            if (modalityChart) {
+                modalityChart.destroy();
+                modalityChart = null;
+            }
+            
+            modalityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results.map(r => r.modality),
+                    datasets: [{
+                        label: '2-Year Survival',
+                        data: results.map(r => r.survival * 100),
+                        backgroundColor: results.map(r => r.color),
+                        borderColor: results.map(r => r.color),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Technique Survival (%)' },
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // CRI-Guard Calculator
+        function calculateCRI() {
+            const days = parseInt(document.getElementById('cri-days').value);
+            const wbc = parseFloat(document.getElementById('cri-wbc').value);
+            const crp = parseFloat(document.getElementById('cri-crp').value);
+            const previous = parseInt(document.getElementById('cri-previous').value);
+            const site = document.getElementById('cri-site').value;
+            
+            // Risk calculation
+            let baseRisk = 0.05 + (days / 365) * 0.1;
+            baseRisk += (wbc > 11 ? 0.1 : 0) + (crp > 10 ? 0.15 : crp / 100);
+            baseRisk += previous * 0.15;
+            if (site === 'femoral') baseRisk += 0.1;
+            
+            const risk30 = Math.min(0.8, baseRisk);
+            const risk60 = Math.min(0.9, baseRisk * 1.5);
+            const risk90 = Math.min(0.95, baseRisk * 2);
+            
+            document.getElementById('cri-30day').textContent = Math.round(risk30 * 100) + '%';
+            document.getElementById('cri-60day').textContent = Math.round(risk60 * 100) + '%';
+            document.getElementById('cri-90day').textContent = Math.round(risk90 * 100) + '%';
+            
+            const riskLevel = risk30 > 0.3 ? 'HIGH' : risk30 > 0.15 ? 'MODERATE' : 'LOW';
+            const riskClass = risk30 > 0.3 ? 'risk-high' : risk30 > 0.15 ? 'risk-medium' : 'risk-low';
+            document.getElementById('cri-risk-level').innerHTML = `<span class="${riskClass}">${riskLevel}</span>`;
+            
+            // Create risk trajectory chart
+            createRiskChart(risk30, risk60, risk90);
+            
+            // Clinical actions
+            let actions = '';
+            if (risk30 > 0.3) {
+                actions = '⚠️ <strong>Immediate Action Required:</strong><br>';
+                actions += '• Consider prophylactic antibiotics<br>';
+                actions += '• Increase surveillance frequency<br>';
+                actions += '• Evaluate for early catheter replacement<br>';
+                actions += '• Review infection control protocols';
+            } else if (risk30 > 0.15) {
+                actions = '⚡ <strong>Enhanced Monitoring:</strong><br>';
+                actions += '• Weekly clinical assessment<br>';
+                actions += '• Monitor inflammatory markers<br>';
+                actions += '• Reinforce catheter care education';
+            } else {
+                actions = '✓ <strong>Standard Care:</strong><br>';
+                actions += '• Continue routine surveillance<br>';
+                actions += '• Maintain current protocols';
+            }
+            document.getElementById('cri-actions').innerHTML = actions;
+            
+            document.getElementById('cri-results').classList.add('show');
+        }
+
+        // Create risk trajectory chart - FIXED VERSION
+        function createRiskChart(r30, r60, r90) {
+            const ctx = document.getElementById('riskChart');
+            if (!ctx) return;
+            
+            // Properly destroy existing chart
+            if (riskChart) {
+                riskChart.destroy();
+                riskChart = null;
+            }
+            
+            riskChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Now', '30 days', '60 days', '90 days'],
+                    datasets: [{
+                        label: 'Infection Risk',
+                        data: [5, r30 * 100, r60 * 100, r90 * 100],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Risk (%)' },
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
